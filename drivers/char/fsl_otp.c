@@ -349,6 +349,10 @@ static int otp_wait_busy(u32 flags)
 		c = __raw_readl(otp_base + HW_OCOTP_CTRL);
 		if (!(c & (BM_OCOTP_CTRL_BUSY | BM_OCOTP_CTRL_ERROR | flags)))
 			break;
+		/* Clear error before attempting further OTP accesses */
+		if (c & (BM_OCOTP_CTRL_ERROR | flags))
+			__raw_writel(BM_OCOTP_CTRL_ERROR,
+				     otp_base + HW_OCOTP_CTRL_CLR);
 		cpu_relax();
 	}
 
